@@ -1,86 +1,71 @@
 import React, { useState } from 'react';
-import Map, { Marker, Popup } from 'react-map-gl';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useMockData } from '../hooks/useMockData';
-import { MapPin } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { useNavigate } from 'react-router-dom';
+import L from 'leaflet';
+import { MapPin } from 'lucide-react';
 
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
+// Custom Icon using Lucide
+const customIcon = new L.Icon({
+    iconUrl: `data:image/svg+xml;base64,${btoa(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="#1976d2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/><circle cx="12" cy="9" r="2.5" fill="white"/></svg>'
+    )}`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32],
+});
 
 function MapPage() {
   const navigate = useNavigate();
   const { issues } = useMockData();
   const [selectedIssue, setSelectedIssue] = useState<(typeof issues[0]) | null>(null);
 
-  const initialViewState = {
-    longitude: 77.216721, // Delhi
-    latitude: 28.644800,
-    zoom: 11
-  };
-
-  if (!MAPBOX_TOKEN || MAPBOX_TOKEN === 'YOUR_MAPBOX_TOKEN') {
-    return (
-        <PageLayout title="Map">
-            <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-                <h2 className="text-2xl font-bold text-error mb-4">Map Configuration Error</h2>
-                <p className="text-text-secondary">
-                    A Mapbox access token is required to display the map. Please add your token to the 
-                    <code className="bg-gray-200 text-red-600 px-2 py-1 rounded-md mx-1">.env</code> file as 
-                    <code className="bg-gray-200 text-red-600 px-2 py-1 rounded-md mx-1">VITE_MAPBOX_TOKEN</code>.
-                </p>
-            </div>
-        </PageLayout>
-    );
-  }
+  const initialPosition: [number, number] = [28.644800, 77.216721]; // Delhi
 
   return (
     <PageLayout title="Issues Map" showBottomNav={true}>
       <div className="relative h-[calc(100vh-120px)]">
-        <Map
-          initialViewState={initialViewState}
-          style={{width: '100%', height: '100%'}}
-          mapStyle="mapbox://styles/mapbox/streets-v11"
-          mapboxAccessToken={MAPBOX_TOKEN}
-        >
+        <MapContainer center={initialPosition} zoom={11} style={{ height: '100%', width: '100%' }}>
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          />
           {issues.map(issue => (
             <Marker
               key={issue.id}
-              longitude={issue.longitude}
-              latitude={issue.latitude}
-              onClick={e => {
-                e.originalEvent.stopPropagation();
-                setSelectedIssue(issue);
+              position={[issue.latitude, issue.longitude]}
+              icon={customIcon}
+              eventHandlers={{
+                click: () => {
+                  setSelectedIssue(issue);
+                },
               }}
             >
-              <MapPin className="w-8 h-8 text-primary-500 cursor-pointer" fill="#1976d2" />
+              {selectedIssue && selectedIssue.id === issue.id && (
+                <Popup>
+                  <Card 
+                    padding="sm" 
+                    className="w-64 cursor-pointer border-none shadow-none" 
+                    onClick={() => navigate(`/issue/${selectedIssue.id}`)}
+                  >
+                    <h3 className="font-semibold text-sm mb-1">{selectedIssue.title}</h3>
+                    <p className="text-xs text-text-secondary mb-2">{selectedIssue.address}</p>
+                    <Badge 
+                        variant={selectedIssue.status === 'resolved' ? 'success' : 'info'}
+                        size="sm"
+                        className="capitalize"
+                    >
+                        {selectedIssue.status.replace('_', ' ')}
+                    </Badge>
+                  </Card>
+                </Popup>
+              )}
             </Marker>
           ))}
-
-          {selectedIssue && (
-            <Popup
-              longitude={selectedIssue.longitude}
-              latitude={selectedIssue.latitude}
-              onClose={() => setSelectedIssue(null)}
-              closeOnClick={false}
-              anchor="top"
-              offset={30}
-            >
-              <Card padding="sm" className="w-64 cursor-pointer" onClick={() => navigate(`/issue/${selectedIssue.id}`)}>
-                <h3 className="font-semibold text-sm mb-1">{selectedIssue.title}</h3>
-                <p className="text-xs text-text-secondary mb-2">{selectedIssue.address}</p>
-                <Badge 
-                    variant={selectedIssue.status === 'resolved' ? 'success' : 'info'}
-                    size="sm"
-                    className="capitalize"
-                >
-                    {selectedIssue.status.replace('_', ' ')}
-                </Badge>
-              </Card>
-            </Popup>
-          )}
-        </Map>
+        </MapContainer>
       </div>
     </PageLayout>
   );

@@ -5,9 +5,10 @@ import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { GarbageIcon, RoadIcon, WaterIcon, StreetlightIcon } from '../components/icons/CivicIcons';
-import { MapPin, TrendingUp, Users, CheckCircle } from 'lucide-react';
+import { MapPin, CheckCircle } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useMockData } from '../hooks/useMockData';
+import { ChatBubble } from '../components/chat/ChatBubble';
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -114,39 +115,8 @@ function DashboardPage() {
             ))}
           </div>
         </Card>
-
-        {/* Community Impact */}
-        <Card variant="elevated" padding="lg">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="p-2 bg-accent-100 rounded-xl">
-              <Users className="w-6 h-6 text-accent-500" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-text-primary">
-                Community Impact
-              </h2>
-              <p className="text-sm text-text-secondary">
-                Together we're building a better city
-              </p>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <p className="text-2xl font-bold text-primary-500">{stats.totalReports}</p>
-              <p className="text-xs text-text-secondary">Total Reports</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-secondary-500">{stats.totalResolved}</p>
-              <p className="text-xs text-text-secondary">Resolved</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-accent-500">{stats.citizensHelped}</p>
-              <p className="text-xs text-text-secondary">Citizens Helped</p>
-            </div>
-          </div>
-        </Card>
       </div>
+      <ChatBubble />
     </PageLayout>
   );
 }

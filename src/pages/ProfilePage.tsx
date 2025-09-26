@@ -5,8 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/Avatar';
-import { Settings, LogOut, FileText, Star } from 'lucide-react';
-import { cn } from '../utils/cn';
+import { Settings, LogOut, FileText, Star, Shield } from 'lucide-react';
 
 function ProfilePage() {
   const navigate = useNavigate();
@@ -16,6 +15,8 @@ function ProfilePage() {
     await signOut();
     navigate('/login');
   };
+
+  const isAdmin = user?.role === 'authority' || user?.role === 'ngo';
 
   return (
     <PageLayout title="My Profile">
@@ -60,6 +61,11 @@ function ProfilePage() {
 
         {/* Menu Options */}
         <div className="space-y-2">
+            {isAdmin && (
+              <Button variant="ghost" className="w-full justify-start text-base" onClick={() => navigate('/admin')}>
+                  <Shield className="w-5 h-5 mr-3 text-text-secondary" /> Admin Dashboard
+              </Button>
+            )}
             <Button variant="ghost" className="w-full justify-start text-base">
                 <FileText className="w-5 h-5 mr-3 text-text-secondary" /> My Reports
             </Button>

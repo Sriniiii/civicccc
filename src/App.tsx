@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/router/ProtectedRoute';
+import AdminRoute from './components/router/AdminRoute';
 
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/auth/LoginPage';
@@ -12,6 +13,9 @@ import IssuesPage from './pages/IssuesPage';
 import IssueDetailPage from './pages/IssueDetailPage';
 import ProfilePage from './pages/ProfilePage';
 import NotificationsPage from './pages/NotificationsPage';
+import ReportPage from './pages/ReportPage';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import ChatPage from './pages/ChatPage';
 
 function App() {
   return (
@@ -32,6 +36,11 @@ function App() {
           <Route path="/issue/:id" element={<ProtectedRoute><IssueDetailPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
+          <Route path="/report" element={<ProtectedRoute><ReportPage /></ProtectedRoute>} />
+          <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />
           
           {/* Add a 404 Not Found page later */}
         </Routes>
